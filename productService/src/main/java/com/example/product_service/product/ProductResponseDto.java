@@ -13,6 +13,7 @@ public record ProductResponseDto (
         Category category,
         BigDecimal price,
         int stock,
+        String status,
         LocalDateTime createdAt
 
 ){ }

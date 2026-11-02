@@ -36,6 +36,9 @@ public class Product {
     @Column(name = "stock", nullable = false, columnDefinition = "INT DEFAULT 0")
     private int stock;
 
+    @Column(name = "status", nullable = false)
+    private String status = "ACTIVE";
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

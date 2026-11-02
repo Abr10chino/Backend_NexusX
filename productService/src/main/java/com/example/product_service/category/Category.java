@@ -19,4 +19,7 @@ public class Category {
     @Column(name = "name", nullable = false, unique = true)
     private String categoryName;
 
+    @Column(name = "status", nullable = false)
+    private String status = "ACTIVE";
+
 }
