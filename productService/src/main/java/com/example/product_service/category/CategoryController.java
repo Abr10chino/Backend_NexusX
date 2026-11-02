@@ -54,7 +54,7 @@ public class CategoryController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Categoría encontrada"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Categoría no encontrada")
     })
-    @GetMapping("categories/{id}")
+    @GetMapping("category/{id}")
     public ResponseEntity<ApiResponse<CategoryResponseDto>> getCategoryById(
             @PathVariable Long id,
             HttpServletRequest request
@@ -77,7 +77,7 @@ public class CategoryController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Categoría encontrada"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Categoría no encontrada")
     })
-    @GetMapping("categories/search")
+    @GetMapping("category")
     public ResponseEntity<ApiResponse<CategoryResponseDto>> getCategoryByName(
             @RequestParam String name,
             HttpServletRequest request
@@ -102,7 +102,7 @@ public class CategoryController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "Categoría creada con éxito"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "409", description = "La categoría ya está registrada")
     })
-    @PostMapping("categories")
+    @PostMapping("category")
     public ResponseEntity<ApiResponse<Category>> createCategory(
             @RequestBody CategoryRequestDto categoryRequestDto,
             HttpServletRequest request
@@ -120,21 +120,21 @@ public class CategoryController {
         ));
     }
 
-    @Operation(summary = "Creación masiva de categorías", description = "Registra múltiples categorías a la vez validando duplicados")
+    @Operation(summary = "Creación de categorías", description = "Registra múltiples categorías a la vez validando duplicados")
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "Categorías creadas con éxito"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "409", description = "Alguna categoría ya está registrada")
     })
-    @PostMapping("categories/batch")
+    @PostMapping("categories")
     public ResponseEntity<ApiResponse<List<Category>>> createCategories(
             @RequestBody List<CategoryRequestDto> categoryRequestDtos,
             HttpServletRequest request
     ){
-        log.info("Petición: Creación masiva de {} categorías", categoryRequestDtos.size());
+        log.info("Petición: Creación de {} categorías", categoryRequestDtos.size());
 
         List<Category> createdList = categoryService.createCategories(categoryRequestDtos);
 
-        log.info("Éxito: Se registraron {} categorías masivamente", createdList.size());
+        log.info("Éxito: Se registraron {} categorías", createdList.size());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(ResponseUtil.success(
                 createdList,
@@ -151,7 +151,7 @@ public class CategoryController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Categoría no encontrada"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "409", description = "El nuevo nombre ya pertenece a otra categoría")
     })
-    @PutMapping("categories/{id}")
+    @PutMapping("category/{id}")
     public ResponseEntity<ApiResponse<CategoryResponseDto>> updateCategory(
             @PathVariable Long id,
             @RequestBody CategoryRequestDto requestDto,
@@ -177,7 +177,7 @@ public class CategoryController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Categoría marcada como inactiva"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Categoría no encontrada")
     })
-    @DeleteMapping("categories/{id}")
+    @DeleteMapping("category/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteCategory(
             @PathVariable Long id,
             HttpServletRequest request
@@ -195,17 +195,17 @@ public class CategoryController {
         ));
     }
 
-    @Operation(summary = "Eliminación masiva de categorías (Borrado lógico)", description = "Cambia el estatus a INACTIVE de múltiples categorías por sus IDs")
+    @Operation(summary = "Eliminación de categorías (Borrado lógico)", description = "Cambia el estatus a INACTIVE de múltiples categorías por sus IDs")
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Categorías marcadas como inactivas"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "No se encontraron categorías para los IDs dados")
     })
-    @DeleteMapping("categories/batch")
+    @DeleteMapping("categories")
     public ResponseEntity<ApiResponse<Void>> deleteCategories(
             @RequestBody List<Long> ids,
             HttpServletRequest request
     ){
-        log.info("Petición: Eliminación masiva (lógica) de {} categorías", ids.size());
+        log.info("Petición: Eliminación (lógica) de {} categorías", ids.size());
 
         categoryService.deleteCategories(ids);
 

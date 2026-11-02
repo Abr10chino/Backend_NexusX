@@ -23,6 +23,7 @@ public class CategoryService {
     public List<CategoryResponseDto> findAllCategories(){
 
         List<CategoryResponseDto> categories = categoryRepository.findAll().stream()
+                .filter(category -> "ACTIVE".equalsIgnoreCase(category.getStatus()))
                 .map(this::toEntity)
                 .toList();
 
