@@ -48,7 +48,7 @@ public class CategoryService {
 
     public CategoryResponseDto findByName(String name){
 
-        return toEntity(categoryRepository.findByName(name).orElseThrow(
+        return toEntity(categoryRepository.findByCategoryName(name).orElseThrow(
                 () -> new ResouceNotFoundException("Categoria con el nombre: " + name + " no fue hallada.")
         ));
 

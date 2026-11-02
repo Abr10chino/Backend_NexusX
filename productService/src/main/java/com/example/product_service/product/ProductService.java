@@ -40,7 +40,7 @@ public class ProductService {
     }
 
     public ProductResponseDto findByCode(String code) {
-        return toEntity(productRepository.findByCode(code).orElseThrow(
+        return toEntity(productRepository.findByBarCode(code).orElseThrow(
                 () -> new ResouceNotFoundException("Producto con el codigo: " + code + " no fue hallado.")
         ));
     }
@@ -48,7 +48,7 @@ public class ProductService {
     /*Metodos para Creacion*/
 
     public Product createProduct(ProductRequestDto productRequestDto) {
-        if (productRepository.existsByCode(productRequestDto.barCode())) {
+        if (productRepository.existsByBarCode(productRequestDto.barCode())) {
             throw new ConflictException("El producto con el codigo: " + productRequestDto.barCode() + " ya esta registrado.");
         }
 
@@ -66,7 +66,7 @@ public class ProductService {
                 () -> new ResouceNotFoundException("Producto con el ID: " + id + " no fue hallado.")
         );
 
-        if (!product.getBarCode().equals(request.barCode()) && productRepository.existsByCode(request.barCode())) {
+        if (!product.getBarCode().equals(request.barCode()) && productRepository.existsByBarCode(request.barCode())) {
             throw new ConflictException("El producto con el codigo: " + request.barCode() + " ya esta registrado.");
         }
 
