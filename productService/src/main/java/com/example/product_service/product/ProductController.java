@@ -54,7 +54,7 @@ public class ProductController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Producto encontrado"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Producto no encontrado")
     })
-    @GetMapping("products/{id}")
+    @GetMapping("product/{id}")
     public ResponseEntity<ApiResponse<ProductResponseDto>> getProductById(
             @PathVariable Long id,
             HttpServletRequest request
@@ -77,7 +77,7 @@ public class ProductController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Producto encontrado"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Producto no encontrado")
     })
-    @GetMapping("products/search")
+    @GetMapping("product")
     public ResponseEntity<ApiResponse<ProductResponseDto>> getProductByCode(
             @RequestParam String code,
             HttpServletRequest request
@@ -102,7 +102,7 @@ public class ProductController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "Producto creado con éxito"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "409", description = "El codigo ya existe")
     })
-    @PostMapping("products")
+    @PostMapping("product")
     public ResponseEntity<ApiResponse<Product>> createProduct(
             @RequestBody ProductRequestDto requestDto,
             HttpServletRequest request
@@ -120,6 +120,30 @@ public class ProductController {
         ));
     }
 
+    @Operation(summary = "Creación masiva de productos", description = "Registra múltiples productos a la vez validando códigos")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "Productos creados con éxito"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "409", description = "Algún código de producto ya existe")
+    })
+    @PostMapping("products")
+    public ResponseEntity<ApiResponse<ProductBatchDto>> createProducts(
+            @RequestBody List<ProductRequestDto> requestDtos,
+            HttpServletRequest request
+    ){
+        log.info("Petición: Creación de {} productos", requestDtos.size());
+
+        ProductBatchDto createdList = productService.createProducts(requestDtos);
+
+        log.info("Éxito: Lote procesado. Exitosos: {}, Rechazados: {}",
+                createdList.successfulProducts().size(), createdList.rejectedProducts().size());
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(ResponseUtil.success(
+                createdList,
+                "Batch Processed Successfully",
+                request.getRequestURI()
+        ));
+    }
+
     /* Endpoints de Actualizacion */
 
     @Operation(summary = "Actualizar producto", description = "Modifica un producto existente por su ID")
@@ -128,7 +152,7 @@ public class ProductController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Producto no encontrado"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "409", description = "El codigo ya existe en otro producto")
     })
-    @PutMapping("products/{id}")
+    @PutMapping("product/{id}")
     public ResponseEntity<ApiResponse<ProductResponseDto>> updateProduct(
             @PathVariable Long id,
             @RequestBody ProductRequestDto requestDto,
@@ -154,7 +178,7 @@ public class ProductController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Producto eliminado (inactivo)"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Producto no encontrado")
     })
-    @DeleteMapping("products/{id}")
+    @DeleteMapping("product/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteProduct(
             @PathVariable Long id,
             HttpServletRequest request
@@ -177,7 +201,7 @@ public class ProductController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Productos eliminados (inactivos)"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "No se encontraron los productos")
     })
-    @DeleteMapping("products/batch")
+    @DeleteMapping("products")
     public ResponseEntity<ApiResponse<Void>> deleteProducts(
             @RequestBody List<Long> ids,
             HttpServletRequest request
@@ -194,4 +218,28 @@ public class ProductController {
                 request.getRequestURI()
         ));
     }
+
+    @Operation(summary = "Reactivar producto", description = "Cambia el estado de un producto a ACTIVE por su ID")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Producto reactivado con éxito"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Producto no encontrado")
+    })
+    @PatchMapping("product/{id}")
+    public ResponseEntity<ApiResponse<ProductResponseDto>> activateProduct(
+            @PathVariable Long id,
+            HttpServletRequest request
+    ){
+        log.info("Petición: Reactivando producto con ID: {}", id);
+
+        ProductResponseDto activated = productService.activateProduct(id);
+
+        log.info("Éxito: Producto con ID {} pasado a ACTIVE", id);
+
+        return ResponseEntity.ok(ResponseUtil.success(
+                activated,
+                "Product Activated Successfully",
+                request.getRequestURI()
+        ));
+    }
+
 }

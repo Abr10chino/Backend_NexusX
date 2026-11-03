@@ -23,6 +23,7 @@ public class ProductService {
 
     public List<ProductResponseDto> findAllProducts() {
         List<ProductResponseDto> products = productRepository.findAll().stream()
+                .filter(product -> "ACTIVE".equalsIgnoreCase(product.getStatus()))
                 .map(this::toEntity)
                 .toList();
 
@@ -59,6 +60,30 @@ public class ProductService {
         return productRepository.save(toEntity(productRequestDto, category));
     }
 
+    public ProductBatchDto createProducts(List<ProductRequestDto> requestDtos) {
+        List<ProductResponseDto> successfulProducts = new java.util.ArrayList<>();
+        List<ProductErrorDto> rejectedProducts = new java.util.ArrayList<>();
+
+        for (ProductRequestDto dto : requestDtos) {
+            if (productRepository.existsByBarCode(dto.barCode())) {
+                rejectedProducts.add(new ProductErrorDto(dto.barCode(), "El producto con el codigo ya esta registrado."));
+                continue;
+            }
+
+            var categoryOpt = categoryRepository.findById(dto.CategoryId());
+            if (categoryOpt.isEmpty()) {
+                rejectedProducts.add(new ProductErrorDto(dto.barCode(), "Categoria con el ID: " + dto.CategoryId() + " no fue hallada."));
+                continue;
+            }
+
+            Product product = toEntity(dto, categoryOpt.get());
+            Product saved = productRepository.save(product);
+            successfulProducts.add(toEntity(saved));
+        }
+
+        return new ProductBatchDto(successfulProducts, rejectedProducts);
+    }
+
     /*Metodos para Actualizar*/
 
     public ProductResponseDto updateProduct(Long id, ProductRequestDto request) {
@@ -82,6 +107,17 @@ public class ProductService {
 
         Product updated = productRepository.save(product);
         return toEntity(updated);
+    }
+
+    public ProductResponseDto activateProduct(Long id) {
+        Product product = productRepository.findById(id).orElseThrow(
+                () -> new ResouceNotFoundException("Producto con el ID: " + id + " no fue hallado.")
+        );
+
+        product.setStatus("ACTIVE");
+        Product savedProduct = productRepository.save(product);
+
+        return toEntity(savedProduct);
     }
 
     /*Metodos para Eliminar*/
