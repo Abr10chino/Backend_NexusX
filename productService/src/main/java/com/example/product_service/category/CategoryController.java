@@ -218,4 +218,28 @@ public class CategoryController {
         ));
     }
 
+    @Operation(summary = "Reactivar categoría", description = "Cambia el estatus de una categoría a ACTIVE por su ID")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Categoría reactivada con éxito"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Categoría no encontrada")
+    })
+
+    @PatchMapping("category/{id}")
+    public ResponseEntity<ApiResponse<CategoryResponseDto>> activateCategory(
+            @PathVariable Long id,
+            HttpServletRequest request
+    ){
+        log.info("Petición: Reactivando categoría con ID: {}", id);
+
+        CategoryResponseDto activated = categoryService.activateCategory(id);
+
+        log.info("Éxito: Categoría con ID {} pasada a ACTIVE", id);
+
+        return ResponseEntity.ok(ResponseUtil.success(
+                activated,
+                "Category Activated Successfully",
+                request.getRequestURI()
+        ));
+    }
+
 }

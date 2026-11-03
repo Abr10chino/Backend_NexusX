@@ -109,6 +109,16 @@ public class CategoryService {
         return toEntity(updated);
     }
 
+    public CategoryResponseDto activateCategory(Long id) {
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new ResouceNotFoundException("Categoría con el ID: " + id + " no fue hallada."));
+
+        category.setStatus("ACTIVE");
+        Category savedCategory = categoryRepository.save(category);
+
+        return toEntity(savedCategory);
+    }
+
     /*Metodos para Eliminar*/
     public void deleteCategory(Long id) {
         Category category = categoryRepository.findById(id).orElseThrow(
