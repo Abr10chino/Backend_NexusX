@@ -1,0 +1,41 @@
+services:
+  eurekaserver:
+    build: ./eurekaserver
+    container_name: eurekaserver
+    ports:
+      - "8761:8761"
+
+  apigateway:
+    build: ./apigateway
+    container_name: apigateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - eurekaserver
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+
+  productservice:
+    build: ./productService
+    container_name: productservice
+    ports:
+      - "8081:8081"
+    depends_on:
+      - eurekaserver
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+
+  importservice:
+    build: ./importService
+    container_name: importservice
+    ports:
+      - "8082:8082"
+    depends_on:
+      - eurekaserver
+      - productservice
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
