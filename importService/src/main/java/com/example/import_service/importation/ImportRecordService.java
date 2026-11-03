@@ -1,6 +1,7 @@
 package com.example.import_service.importation;
 
 import com.example.import_service.dtos.*;
+import com.example.import_service.exception.ResouceNotFoundException;
 import com.example.import_service.importationError.ImportError;
 import com.example.import_service.importationError.ImportErrorRepository;
 import com.example.import_service.response.ApiResponse;
@@ -47,7 +48,7 @@ public class ImportRecordService {
 
     public ImportResponseDto getImportById(Long id){
         ImportRecord record = importRecordRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Importación no encontrada con ID: " + id));
+                .orElseThrow(() -> new ResouceNotFoundException("Importación no encontrada con ID: " + id));
 
         List<ImportError> dbErrors = importErrorRepository.findByImportRecordId(id);
         List<ProductRejectedDto> errorDtos = dbErrors.stream().map(err -> {
