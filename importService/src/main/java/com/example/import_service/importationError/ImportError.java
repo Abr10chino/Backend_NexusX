@@ -18,7 +18,7 @@ public class ImportError {
     @JoinColumn(name = "import_id", nullable = false)
     private ImportRecord importRecord;
 
-    @Column(name="row_number", nullable = false)
+    @Column(name="`row_number`", nullable = false)
     private int rowNumber;
 
     @Column(name="raw_data", nullable = false, columnDefinition = "TEXT")

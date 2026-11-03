@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class ProductRejectedDto {
 
-    private String barCde;
+    private String barCode;
     private String reason;
 
 }

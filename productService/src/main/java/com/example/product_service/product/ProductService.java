@@ -53,8 +53,8 @@ public class ProductService {
             throw new ConflictException("El producto con el codigo: " + productRequestDto.barCode() + " ya esta registrado.");
         }
 
-        Category category = categoryRepository.findById(productRequestDto.CategoryId()).orElseThrow(
-                () -> new ResouceNotFoundException("Categoria con el ID: " + productRequestDto.CategoryId() + " no fue hallada.")
+        Category category = categoryRepository.findById(productRequestDto.categoryId()).orElseThrow(
+                () -> new ResouceNotFoundException("Categoria con el ID: " + productRequestDto.categoryId() + " no fue hallada.")
         );
 
         return productRepository.save(toEntity(productRequestDto, category));
@@ -70,9 +70,9 @@ public class ProductService {
                 continue;
             }
 
-            var categoryOpt = categoryRepository.findById(dto.CategoryId());
+            var categoryOpt = categoryRepository.findById(dto.categoryId());
             if (categoryOpt.isEmpty()) {
-                rejectedProducts.add(new ProductErrorDto(dto.barCode(), "Categoria con el ID: " + dto.CategoryId() + " no fue hallada."));
+                rejectedProducts.add(new ProductErrorDto(dto.barCode(), "Categoria con el ID: " + dto.categoryId() + " no fue hallada."));
                 continue;
             }
 
@@ -95,8 +95,8 @@ public class ProductService {
             throw new ConflictException("El producto con el codigo: " + request.barCode() + " ya esta registrado.");
         }
 
-        Category category = categoryRepository.findById(request.CategoryId()).orElseThrow(
-                () -> new ResouceNotFoundException("Categoria con el ID: " + request.CategoryId() + " no fue hallada.")
+        Category category = categoryRepository.findById(request.categoryId()).orElseThrow(
+                () -> new ResouceNotFoundException("Categoria con el ID: " + request.categoryId() + " no fue hallada.")
         );
 
         product.setBarCode(request.barCode());

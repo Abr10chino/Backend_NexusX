@@ -6,7 +6,7 @@ public record ProductRequestDto(
 
         String barCode,
         String productName,
-        Long CategoryId,
+        Long categoryId,
         BigDecimal price,
         int stock
 
