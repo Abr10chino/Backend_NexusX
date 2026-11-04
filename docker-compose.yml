@@ -4,6 +4,12 @@ services:
     container_name: eurekaserver
     ports:
       - "8761:8761"
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8761/eureka/apps"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
 
   apigateway:
     build: ./apigateway
@@ -11,7 +17,8 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - eurekaserver
+      eurekaserver:
+        condition: service_healthy
     environment:
       - SPRING_PROFILES_ACTIVE=docker
 
@@ -21,7 +28,8 @@ services:
     ports:
       - "8081:8081"
     depends_on:
-      - eurekaserver
+      eurekaserver:
+        condition: service_healthy
     extra_hosts:
       - "host.docker.internal:host-gateway"
     environment:
@@ -33,8 +41,10 @@ services:
     ports:
       - "8082:8082"
     depends_on:
-      - eurekaserver
-      - productservice
+      eurekaserver:
+        condition: service_healthy
+      productservice:
+        condition: service_started
     extra_hosts:
       - "host.docker.internal:host-gateway"
     environment:
