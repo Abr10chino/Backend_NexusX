@@ -1,4 +1,23 @@
 services:
+  db:
+    image: mysql:8.0
+    container_name: dbNexusX
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: nexusXDB
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./db.sql:/docker-entrypoint-initdb.d/db.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
   eurekaserver:
     build: ./eurekaserver
     container_name: eurekaserver
@@ -30,6 +49,8 @@ services:
     depends_on:
       eurekaserver:
         condition: service_healthy
+      db:
+        condition: service_healthy
     extra_hosts:
       - "host.docker.internal:host-gateway"
     environment:
@@ -43,9 +64,12 @@ services:
     depends_on:
       eurekaserver:
         condition: service_healthy
-      productservice:
-        condition: service_started
+      db:
+        condition: service_healthy
     extra_hosts:
       - "host.docker.internal:host-gateway"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
+
+volumes:
+  db_data:
